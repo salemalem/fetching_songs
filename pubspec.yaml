@@ -27,6 +27,9 @@ dependencies:
   # to fetch data from the internet
   http: ^0.12.0+4
 
+  # to extract data from fetched data
+  html: ^0.14.0+3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
