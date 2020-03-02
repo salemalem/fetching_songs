@@ -11,6 +11,12 @@ Future<List<List<String>>> fetchSongs(url)  async {
   List<String> songDurations = [];
   List<String> songImages = [];
 
+  RegExp songImageRegex = new RegExp(
+    r"url\('(.*?)'\);",
+    caseSensitive: false,
+    multiLine: false,
+  );
+
   final response = await http.get(url);
   if (response.statusCode == 200) {
     dom.Document document = parse(response.body);
@@ -27,7 +33,10 @@ Future<List<List<String>>> fetchSongs(url)  async {
         songDurations.add(
             songDurationsFromResponse[i].text.trimLeft().trimRight());
         songLinks.add(songLinksFromResponse[i].attributes['href']);
-        songImages.add(songImagesFromResponse[i].attributes['style']);
+        final songImageRegexMatch = songImageRegex.
+          firstMatch(songImagesFromResponse[i].attributes['style']);
+        final String songImageSrc = "https://hotmo.org/" + songImageRegexMatch.group(1);
+        songImages.add(songImageSrc);
       }
     }
     return [songImages, songNames, songArtists, songDurations, songLinks];

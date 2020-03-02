@@ -17,6 +17,8 @@ void main() {
 var songsNamesList = [];
 var songsArtistsList = [];
 var songsLinksList = [];
+var songImagesList = [];
+var songDurationsList = [];
 
 class SearchMusic extends StatefulWidget {
   @override
@@ -26,8 +28,11 @@ class SearchMusic extends StatefulWidget {
 }
 class _SearchMusicState extends State<SearchMusic> {
   TextEditingController _searchMusicController = TextEditingController();
-  final snackBar = SnackBar(
+  final downloadSuccessfulSnackBar = SnackBar(
       content: Text('Сәтті! Жүктелді!'),
+  );
+  final downloadingSnackBar = SnackBar(
+    content: Text('Жүктелуде...'),
   );
 
   // @source: https://stackoverflow.com/questions/53004218/flutter-save-a-network-mp3-file-to-local-directory
@@ -79,10 +84,13 @@ class _SearchMusicState extends State<SearchMusic> {
                       songsNamesList = val[1];
                       songsArtistsList = val[2];
                       songsLinksList = val[4];
+                      songImagesList = val[0];
+                      songDurationsList = val[3];
                     } else {
                       songsNamesList = ['Іздегеніңіз Табылмады'];
                       songsArtistsList = ['Басқаша іздеп көріңіз'];
                       songsLinksList = [''];
+                      songDurationsList = [''];
                     }
                   }));
             },
@@ -91,21 +99,37 @@ class _SearchMusicState extends State<SearchMusic> {
             child: ListView.builder(
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(songsNamesList[index]),
-                  subtitle: Text(songsArtistsList[index]),
-                  trailing: IconButton(
-                    icon: Icon(Icons.file_download),
-                    onPressed: () async {
-                      // download pressed
-                      String filename = songsNamesList[index] + " - " + songsArtistsList[index];
-//                      downloadMp3FromUrl(songsLinksList[index], filename);
-                      var dir = await getExternalStorageDirectory();
-                      filename = dir.path + "/" + filename + ".mp3";
-                        downloadFile(songsLinksList[index], filename).whenComplete(() {
-                          Scaffold.of(context).showSnackBar(snackBar);
-                        });
-                    },
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(songImagesList[index]),
                   ),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(songsNamesList[index]),
+                      Text(songDurationsList[index]),
+                    ],
+                  ),
+                  subtitle: Text(songsArtistsList[index]),
+                  trailing:
+                  IconButton(
+                        icon: Icon(Icons.file_download),
+                        onPressed: () async {
+                          // download pressed
+                          Scaffold.of(context).showSnackBar(downloadingSnackBar);
+                          if (songsLinksList[index] != '') {
+                            String filename = songsNamesList[index] + " - " +
+                                songsArtistsList[index];
+//                      downloadMp3FromUrl(songsLinksList[index], filename);
+                            var dir = await getExternalStorageDirectory();
+                            filename = dir.path + "/" + filename + ".mp3";
+                            downloadFile(songsLinksList[index], filename)
+                                .whenComplete(() {
+                              Scaffold.of(context).showSnackBar(downloadSuccessfulSnackBar);
+                            });
+                          }
+                        },
+                      ),
+
                   onTap: () {
 
                   },
