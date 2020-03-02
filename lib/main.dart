@@ -1,10 +1,8 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:path_provider/path_provider.dart';
-import 'package:dio/dio.dart';
 
 import 'utils/returnBuiltUrl.dart';
 import 'utils/fetchSongs.dart';
@@ -28,17 +26,16 @@ class SearchMusic extends StatefulWidget {
 }
 class _SearchMusicState extends State<SearchMusic> {
   TextEditingController _searchMusicController = TextEditingController();
-  bool downloading = false;
-  var progressString = "";
+  final snackBar = SnackBar(
+      content: Text('Сәтті! Жүктелді!'),
+  );
 
-
+  // @source: https://stackoverflow.com/questions/53004218/flutter-save-a-network-mp3-file-to-local-directory
   Future<dynamic> downloadFile(String url, filename) async {
-//      String dir = (await getApplicationDocumentsDirectory()).path;
     File file = new File(filename);
     var request = await http.get(url,);
     var bytes = await request.bodyBytes;//close();
     await file.writeAsBytes(bytes);
-    print(file.path);
   }
 
   @override
@@ -104,7 +101,9 @@ class _SearchMusicState extends State<SearchMusic> {
 //                      downloadMp3FromUrl(songsLinksList[index], filename);
                       var dir = await getExternalStorageDirectory();
                       filename = dir.path + "/" + filename + ".mp3";
-                        downloadFile(songsLinksList[index], filename);
+                        downloadFile(songsLinksList[index], filename).whenComplete(() {
+                          Scaffold.of(context).showSnackBar(snackBar);
+                        });
                     },
                   ),
                   onTap: () {
@@ -115,26 +114,6 @@ class _SearchMusicState extends State<SearchMusic> {
               itemCount: songsNamesList.length,
             ),
           ),
-          downloading ? Container(
-            child: Card(
-              color: Colors.white,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  CircularProgressIndicator(),
-                  Text(
-                    "Жазылуда: $progressString",
-                    style: TextStyle(
-                      color: Colors.black,
-                    ),
-                  )
-                ],
-              ),
-            ),
-            color: Colors.white,
-          )
-          :
-          Container(),
         ],
       ),
     );
