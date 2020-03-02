@@ -39,12 +39,12 @@ class _SearchMusicState extends State<SearchMusic> {
   Future<dynamic> downloadFile(String url, filename) async {
     File file = new File(filename);
     var request = await http.get(url,);
-    var bytes = await request.bodyBytes;//close();
+    var bytes = request.bodyBytes;//close();
     await file.writeAsBytes(bytes);
   }
 
   @override
-  Future<void> initState() {
+  void initState() {
     // TODO: implement initState
     super.initState();
 

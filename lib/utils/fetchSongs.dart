@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
-import 'package:html/dom_parsing.dart' as dom_parser;
 
 Future<List<List<String>>> fetchSongs(url)  async {
   List<String> songArtists = [];
